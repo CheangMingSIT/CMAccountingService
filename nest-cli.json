@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/nxgen-project/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "builder": "swc",
+    "webpack": true,
+    "tsConfigPath": "apps/nxgen-project/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/nxgen-project",
+  "projects": {
+    "database": {
+      "type": "library",
+      "root": "libs/datanase",
+      "entryFile": "index",
+      "sourceRoot": "libs/datanase/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "interface": {
+      "type": "library",
+      "root": "libs/interface",
+      "entryFile": "index",
+      "sourceRoot": "libs/interface/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/interface/tsconfig.lib.json"
+      }
+    },
+    "kafka": {
+      "type": "library",
+      "root": "libs/kafka",
+      "entryFile": "index",
+      "sourceRoot": "libs/kafka/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/kafka/tsconfig.lib.json"
+      }
+    },
+    "nxgen-project": {
+      "type": "application",
+      "root": "apps/nxgen-project",
+      "entryFile": "main",
+      "sourceRoot": "apps/nxgen-project/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/nxgen-project/tsconfig.app.json"
+      }
+    },
+    "worker-service": {
+      "type": "application",
+      "root": "apps/worker-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/worker-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/worker-service/tsconfig.app.json",
+        "assets": [
+          "assets/CDR-logs/*.ndjson"
+        ],
+        "watchAssets": true
+      }
+    }
+  }
+}

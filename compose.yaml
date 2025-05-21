@@ -1,0 +1,91 @@
+services:
+  kafka:
+    image: apache/kafka-native
+    ports:
+      - '9092:9092'
+    environment:
+      KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,HOST:PLAINTEXT
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9091
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_RETENTION_MS: 259200000
+    restart: on-failure
+    networks:
+      - nxgen-cdr-network
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          '/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # fluentd:
+  #   image: fluent/fluentd:v1.16-debian
+  #   ports:
+  #     - '24224:24224'
+  #     - '24224:24224/udp'
+  #   volumes:
+  #     - ./fluentd:/fluentd
+  #   command: ['fluentd', '-c', '/fluentd/fluent.conf', '-v']
+
+  nxgen-project:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: nxgen-project
+    container_name: nxgen-project
+    restart: on-failure
+    env_file: .env
+    ports:
+      - '3000:3000'
+      - '50001:50001'
+    # logging:
+    #   driver: fluentd
+    #   options:
+    #     fluentd-address: localhost:24224
+    #     tag: nxgenCM.service
+    networks:
+      - nxgen-cdr-network
+    depends_on:
+      kafka:
+        condition: service_healthy
+      # fluentd
+      #   condition: service_started
+
+  worker-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: worker-service
+    container_name: worker-service
+    restart: on-failure
+    ports:
+      - '3010:3010'
+      - '1433:1433'
+    env_file: .env
+    # logging:
+    #   driver: fluentd
+    #   options:
+    #     fluentd-address: localhost:24224
+    #     tag: nxgenCM.service
+    networks:
+      - nxgen-cdr-network
+    depends_on:
+      kafka:
+        condition: service_healthy
+      # fluentd
+      #   condition: service_started
+
+networks:
+  nxgen-cdr-network:
+    driver: bridge
