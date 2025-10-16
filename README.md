@@ -62,3 +62,47 @@ $ docker compose -f compose.uat.yaml up -d worker-service
 ## Stored CDR records in .txt
 
 CDR records are stored in .txt format within the Docker container. The file path is as follows: `worker-service: /app/dist/assets/CDR-logs`
+
+## Rebuilding and Deploying a New Docker Image
+
+**Follow these steps to update and deploy your Docker-based project:**
+
+1. Make Necessary Edits
+
+   - `docker-compose` files (e.g., `compose.uat.yaml`)
+   - `.env` configuration
+   - Application Code
+
+2. Rebuild the project
+
+```bash
+$ pnpm run build "folder-name"
+$ pnpm run build # if rebuild all folder
+```
+
+3. Build the docker image
+
+```bash
+$ docker build -t <IMAGE_NAME>:latest .
+```
+
+4. Save the docker image to tar file
+
+```bash
+$ docker save -o FILENAME.tar IMAGE-NAME
+```
+
+5. Transfer & Load the Image on the New Server
+
+```bash
+$ docker load -i FILENAME.tar
+```
+
+6.  Start Up All Containers
+
+```bash
+#   Start Kafka before other services
+$ docker compose -f compose.uat.yaml up -d kafka
+$ docker compose -f compose.uat.yaml up -d nxgen-project
+$ docker compose -f compose.uat.yaml up -d worker-service
+```

@@ -1,14 +1,10 @@
 import { CdrDataParameter } from '@app/database';
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { CdrRecordDto } from '@app/interface';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
-import { CdrRecordDto } from '@app/interface';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class WorkerServiceService {

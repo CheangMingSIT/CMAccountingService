@@ -1,9 +1,8 @@
-import { NestFactory } from '@nestjs/core';
-import { WorkerServiceModule } from './worker-service.module';
-import { Transport, MicroserviceOptions } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
-import { ConfigModule } from '@nestjs/config';
 import { BadRequestException, ConsoleLogger } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { WorkerServiceModule } from './worker-service.module';
 
 async function bootstrap() {
   const appContext = await NestFactory.createApplicationContext(

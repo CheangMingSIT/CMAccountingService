@@ -1,6 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
-import { WorkerServiceService } from './worker-service.service';
+import { Controller } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
+import { WorkerServiceService } from './worker-service.service';
 
 @Controller()
 export class WorkerServiceController {

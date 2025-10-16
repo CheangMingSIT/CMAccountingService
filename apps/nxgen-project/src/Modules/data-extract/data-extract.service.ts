@@ -2,8 +2,8 @@ import {
   Inject,
   Injectable,
   Logger,
-  OnModuleInit,
   OnModuleDestroy,
+  OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientKafka } from '@nestjs/microservices';
@@ -18,7 +18,7 @@ export class DataExtractService implements OnModuleInit, OnModuleDestroy {
     @Inject('CMLOGSERVICE') private readonly kafkaClient: ClientKafka,
     private readonly configService: ConfigService,
   ) {
-    this.PORT = this.configService.get<number>('CDR_PORT') || 3001;
+    this.PORT = this.configService.get<number>('CDR_PORT') || 3000;
   }
 
   async onModuleInit() {
