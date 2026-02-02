@@ -1,13 +1,19 @@
-import { Global, Module } from '@nestjs/common';
+import { CdrDataParameter, MssqlDBModule } from '@app/database';
+import { HttpModule } from '@nestjs/axios';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkerServiceController } from './worker-service.controller';
 import { WorkerServiceService } from './worker-service.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { CdrDataParameter, MssqlDBModule } from '@app/database';
 
 @Module({
   imports: [
     MssqlDBModule,
     TypeOrmModule.forFeature([CdrDataParameter], 'mssql'),
+    HttpModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
   ],
   controllers: [WorkerServiceController],
   providers: [WorkerServiceService],

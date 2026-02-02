@@ -1,4 +1,4 @@
-import { IsInt, IsString, Length } from 'class-validator';
+import { IsInt, IsString } from 'class-validator';
 
 export class CdrRecordDto {
   @IsString()
@@ -36,4 +36,10 @@ export class CdrRecordDto {
 
   @IsInt()
   outCrtID: number;
+
+  @IsString()
+  startTime: string;
+
+  @IsString()
+  endTime: string;
 }

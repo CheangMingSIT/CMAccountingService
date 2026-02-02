@@ -29,6 +29,8 @@ $ pnpm install
 
 ### Compile and run the project
 
+Before compiling, delete the `dist` folders to ensure the latest build is generated.
+
 ```bash
 # development
 $ pnpm run start
@@ -40,9 +42,9 @@ $ pnpm run start:dev
 $ pnpm run start:nxgen
 ```
 
-## Environment setup
+## Production Environment setup
 
-This project uses Docker Compose to manage services in the UAT environment. Follow the sequence below to start services in the correct order:
+This project uses Docker Compose to manage services in the production environment. Update the Compose file as needed to meet production requirements. Before starting the services listed below, first create a database in **Microsoft SQL Server**. After that, start the services in the sequence outlined below to ensure they run correctly.
 
 ### Startup Order
 
@@ -53,10 +55,10 @@ This project uses Docker Compose to manage services in the UAT environment. Foll
 #### Commands
 
 ```bash
-# Bring up an individual container in UAT using docker-compose
-$ docker compose -f compose.uat.yaml up -d kafka
-$ docker compose -f compose.uat.yaml up -d nxgen-project
-$ docker compose -f compose.uat.yaml up -d worker-service
+# Bring up an individual container in production using docker-compose
+$ docker compose -f compose.production.yaml up -d kafka
+$ docker compose -f compose.production.yaml up -d nxgen-project
+$ docker compose -f compose.production.yaml up -d worker-service
 ```
 
 ## Stored CDR records in .txt
@@ -68,16 +70,15 @@ CDR records are stored in .txt format within the Docker container. The file path
 **Follow these steps to update and deploy your Docker-based project:**
 
 1. Make Necessary Edits
-
-   - `docker-compose` files (e.g., `compose.uat.yaml`)
-   - `.env` configuration
+   - `docker-compose` files (e.g., `compose.production.yaml`)
+   - `.env.production` configuration
    - Application Code
 
 2. Rebuild the project
 
 ```bash
-$ pnpm run build "folder-name"
-$ pnpm run build # if rebuild all folder
+$ pnpm run build "compiled-folder-name"
+$ pnpm run build # if rebuild all compiled folder
 ```
 
 3. Build the docker image
@@ -102,7 +103,7 @@ $ docker load -i FILENAME.tar
 
 ```bash
 #   Start Kafka before other services
-$ docker compose -f compose.uat.yaml up -d kafka
-$ docker compose -f compose.uat.yaml up -d nxgen-project
-$ docker compose -f compose.uat.yaml up -d worker-service
+$ docker compose -f compose.production.yaml up -d kafka
+$ docker compose -f compose.production.yaml up -d nxgen-project
+$ docker compose -f compose.production.yaml up -d worker-service
 ```

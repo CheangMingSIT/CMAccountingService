@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'CDR', schema: 'dbo' })
 export class CdrDataParameter {
@@ -40,4 +40,10 @@ export class CdrDataParameter {
 
   @Column({ type: 'int', nullable: true })
   outCrtID: number;
+
+  @Column({ type: 'nvarchar', length: 6, nullable: true })
+  startTime: string;
+
+  @Column({ type: 'nvarchar', length: 6, nullable: true })
+  endTime: string;
 }

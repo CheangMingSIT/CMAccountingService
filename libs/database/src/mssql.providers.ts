@@ -15,7 +15,7 @@ export default class mssqlConfig {
       password: configService.get('MSSQL_PASSWORD'),
       database: configService.get('MSSQL_DB'),
       entities: [CdrDataParameter],
-      synchronize: true,
+      // synchronize: true,  //only true when forming the table from scratch
       options: {
         encrypt: false, // set true for Azure or TLS-secured environments
         enableArithAbort: true,

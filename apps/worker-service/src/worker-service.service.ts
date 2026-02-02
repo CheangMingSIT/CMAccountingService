@@ -1,16 +1,27 @@
 import { CdrDataParameter } from '@app/database';
 import { CdrRecordDto } from '@app/interface';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
+import { firstValueFrom } from 'rxjs';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class WorkerServiceService {
+  private readonly logger = new Logger('worker-service');
   constructor(
     @InjectRepository(CdrDataParameter, 'mssql')
     private cdrRepository: Repository<CdrDataParameter>,
+    private readonly configService: ConfigService,
+    private readonly httpService: HttpService,
   ) {}
 
   private baseLogDir = path.join(__dirname, 'assets/CDR-logs');
@@ -24,20 +35,41 @@ export class WorkerServiceService {
     const dirPath = path.join(this.baseLogDir, year, month, day);
 
     if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
+      fs.mkdirSync(dirPath, { recursive: true }); // make the file directory
     }
 
     return path.join(dirPath, 'cdr-records.txt');
   }
 
   async handleCmDataLog(message: any) {
+    // main function of handling the logs
     if (!message) {
       throw new BadRequestException('Empty CM data parameter log');
     }
     const filePath = this.getLogFilePath();
     fs.appendFileSync(filePath, message + '\n'); // append to daily log
     const parsedRecord = this.parseCdrRecord(message);
-    this.cdrRepository.save(parsedRecord);
+    await this.cdrRepository.save(parsedRecord); // append to database
+
+    // passing to another service
+    const url = this.configService.get('URL');
+    if (!url) throw new BadRequestException('INVALID URL');
+    try {
+      await firstValueFrom(
+        this.httpService.post(url, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+      );
+    } catch (error) {
+      console.error(
+        `POST MESSAGE FAIL: ${error?.response?.data || error.message}`,
+      );
+      throw new InternalServerErrorException(
+        'POST MESSAGE FAIL IN HANDLECMDATALOG FUNCTION',
+      );
+    }
   }
 
   private parseCdrRecord(record: string): CdrRecordDto {
@@ -54,6 +86,8 @@ export class WorkerServiceService {
       authCode: record.slice(75, 83).trim(),
       inCrtID: parseInt(record.slice(84, 87).trim() || '0', 10),
       outCrtID: parseInt(record.slice(88, 93).trim() || '0', 10),
+      startTime: record.slice(94, 101).trim(),
+      endTime: record.slice(101, 108).trim(),
     };
   }
 }
