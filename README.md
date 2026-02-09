@@ -28,9 +28,7 @@ CM (Call Management) account service designed to process and manage Avaya CDR (C
 $ pnpm install
 ```
 
-### Compile and run the project
-
-Before compiling, delete the `dist` folders to ensure the latest build is generated.
+### Compile and run the project in development mode
 
 ```bash
 # development
@@ -49,11 +47,11 @@ This project uses Docker Compose to manage services in the production environmen
 
 ### Startup Order
 
-1. Start the Kafka container
-2. Start the Nxgen Project service
-3. Start the Worker Service
+1. kafka
+2. worker-service
+3. nxgen-project
 
-#### Commands
+### Commands line:
 
 ```bash
 # Bring up an individual container in production using docker-compose
@@ -62,44 +60,55 @@ $ docker compose -f compose.production.yaml up -d nxgen-project
 $ docker compose -f compose.production.yaml up -d worker-service
 ```
 
+```bash
+# Bring down all containers
+$ docker compose down
+```
+
 ## Stored CDR records in .txt
 
 CDR records are stored in .txt format within the Docker container. The file path is as follows: `worker-service: /app/dist/assets/CDR-logs`
 
-## Rebuilding and Deploying a New Docker Image
+## Building and Deploying the Docker Images
 
-**Follow these steps to update and deploy your Docker-based project:**
+**Follow these steps to update and deploy the Docker-based project for production:**
 
 1. Make necessary edits
 
-   - `docker-compose` files (e.g., `compose.production.yaml`)
+   - `docker-compose` files -> `compose.production.yaml`
    - `.env.production` configuration
    - Application Code
 
 2. Rebuild the project
 
 ```bash
-$ pnpm run build "compiled-folder-name"
-$ pnpm run build:all # if rebuild all compiled folder
+$ pnpm run build "compiled-folder-name" # rebuild individual dist folder
+$ pnpm run build:all # if rebuild all dist folder
 ```
 
-3.  Start Up All Containers
+3. Build all the images
 
 ```bash
-#   Start Kafka before other services
-$ docker compose -f compose.production.yaml up -d kafka
-$ docker compose -f compose.production.yaml up -d nxgen-project
-$ docker compose -f compose.production.yaml up -d worker-service
+$ docker compose -f compose.production.yaml up -d
 ```
 
-4. Save the docker image to tar file
+4. Save the docker images into tar files
 
 ```bash
 $ docker save -o FILENAME.tar IMAGE-NAME
 ```
 
-5. Transfer & Load the Image onto the New Server
+5. Transfer & Load the tar files onto the new servers
 
 ```bash
 $ docker load -i FILENAME.tar
+```
+
+6. After updating the configuration in both the .env and compose.production.yaml files in the new server, repeat step 3
+
+```bash
+#   Start kafka -> worker-service -> nxgen-project
+$ docker compose -f compose.production.yaml up -d kafka
+$ docker compose -f compose.production.yaml up -d worker-service
+$ docker compose -f compose.production.yaml up -d nxgen-project
 ```

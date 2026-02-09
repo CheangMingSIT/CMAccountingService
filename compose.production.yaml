@@ -1,8 +1,8 @@
 services:
   kafka:
-    image: apache/kafka-native:3.9.1
+    image: apache/kafka-native:3.9.2-rc1
     ports:
-      - "9092:9092" # Exposing the port
+      - "9093:9093"
     environment:
       KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
       KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://kafka:9093
@@ -19,11 +19,7 @@ services:
       - nxgen-cdr-network
 
   nxgen-project:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        SERVICE: nxgen-project
+    image: nxgen-project:latest
     container_name: nxgen-project
     restart: on-failure
     env_file: .env.production
@@ -39,11 +35,7 @@ services:
       - nxgen-cdr-network
 
   worker-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        SERVICE: worker-service
+    image: worker-service:latest
     container_name: worker-service
     restart: on-failure
     ports:
@@ -59,9 +51,6 @@ services:
       - worker_service_data:/app/dist/assets
     networks:
       - nxgen-cdr-network
-    depends_on:
-      kafka:
-        condition: service_healthy
 
 volumes:
   worker_service_data:

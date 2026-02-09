@@ -3,8 +3,9 @@ import { CdrRecordDto } from '@app/interface';
 import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
-  InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -51,23 +52,21 @@ export class WorkerServiceService {
     const parsedRecord = this.parseCdrRecord(message);
     await this.cdrRepository.save(parsedRecord); // append to database
 
-    // passing to another service
+    // passing to Hein service
     const url = this.configService.get('URL');
     if (!url) throw new BadRequestException('INVALID URL');
     try {
       await firstValueFrom(
-        this.httpService.post(url, {
+        this.httpService.post(url, null, {
           headers: {
             'Content-Type': 'application/json',
           },
         }),
       );
     } catch (error) {
-      console.error(
-        `POST MESSAGE FAIL: ${error?.response?.data || error.message}`,
-      );
-      throw new InternalServerErrorException(
-        'POST MESSAGE FAIL IN HANDLECMDATALOG FUNCTION',
+      throw new HttpException(
+        error.response?.data?.message || 'Request failed',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -78,7 +77,7 @@ export class WorkerServiceService {
       time: record.slice(7, 11).trim(),
       duration: record.slice(12, 16).trim(),
       secdur: record.slice(17, 22).trim(),
-      condCode: parseInt(record.slice(23, 24).trim() || '0', 10),
+      condCode: record.slice(23, 24).trim(),
       codeDial: record.slice(25, 29).trim(),
       codeUsed: record.slice(30, 34).trim(),
       dialedNum: record.slice(35, 58).trim(),

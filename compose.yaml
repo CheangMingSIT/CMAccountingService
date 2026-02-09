@@ -1,8 +1,9 @@
 services:
   kafka:
-    image: apache/kafka-native:4.1.1 # Please update to the latest kafka-native
+    image: apache/kafka-native:3.9.2-rc1 # Please update to the latest kafka-native
     ports:
       - "9092:9092"
+      - "9093:9093"
     environment:
       KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
       KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://kafka:9093
@@ -21,7 +22,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1",
+          "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server kafka:9093 || exit 1",
         ]
       interval: 10s
       timeout: 5s
@@ -39,12 +40,8 @@ services:
     ports:
       - "3000:3000"
       - "50001:50001"
-
     networks:
       - nxgen-cdr-network
-    depends_on:
-      kafka:
-        condition: service_healthy
 
   worker-service:
     build:
@@ -62,9 +59,6 @@ services:
       - worker_service_data:/app/dist/assets
     networks:
       - nxgen-cdr-network
-    depends_on:
-      kafka:
-        condition: service_healthy
 
 volumes:
   worker_service_data:

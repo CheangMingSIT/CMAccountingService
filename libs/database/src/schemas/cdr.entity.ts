@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'CDR', schema: 'dbo' })
 export class CdrDataParameter {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number; // Add this only if there's a primary key auto-generated column
 
   @Column({ type: 'nvarchar', length: 6, nullable: true })
@@ -17,8 +17,8 @@ export class CdrDataParameter {
   @Column({ type: 'nvarchar', length: 5, nullable: true })
   secdur: string;
 
-  @Column({ type: 'int', nullable: true })
-  condCode: number;
+  @Column({ type: 'nvarchar', nullable: true })
+  condCode: string;
 
   @Column({ type: 'nvarchar', length: 4, nullable: true })
   codeDial: string;
@@ -35,10 +35,10 @@ export class CdrDataParameter {
   @Column({ type: 'nvarchar', length: 13, nullable: true })
   authCode: string;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'bigint', nullable: true })
   inCrtID: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'bigint', nullable: true })
   outCrtID: number;
 
   @Column({ type: 'nvarchar', length: 6, nullable: true })

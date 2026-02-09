@@ -14,7 +14,7 @@ export class CdrRecordDto {
   secdur: string;
 
   @IsInt()
-  condCode: number;
+  condCode: string;
 
   @IsString()
   codeDial: string;

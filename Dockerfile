@@ -1,5 +1,4 @@
-FROM node:23.11-alpine
-
+FROM node:alpine3.23
 
 ARG SERVICE
 
